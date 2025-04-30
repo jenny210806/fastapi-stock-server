@@ -7,10 +7,10 @@ import random
 
 app = FastAPI()
 
-# CORS 설정 (iOS 앱에서 접근 가능하도록 허용)
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 실제 배포시에는 앱 도메인으로 제한
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,9 +19,11 @@ app.add_middleware(
 # 주식 항목 모델
 class StockItem(BaseModel):
     symbol: str
+    price: float
     changePercent: float
+    volume: int
 
-# 추천 종목 응답 모델
+# 응답 모델
 class StockListResponse(BaseModel):
     stocks: List[StockItem]
 
@@ -29,18 +31,36 @@ class StockListResponse(BaseModel):
 @app.get("/recommend", response_model=StockListResponse)
 def recommend_stocks():
     sample_stocks = [
-        {"symbol": "AAPL", "changePercent": round(random.uniform(-5, 5), 2)},
-        {"symbol": "GOOGL", "changePercent": round(random.uniform(-5, 5), 2)},
-        {"symbol": "MSFT", "changePercent": round(random.uniform(-5, 5), 2)},
-        {"symbol": "TSLA", "changePercent": round(random.uniform(-5, 5), 2)},
-        {"symbol": "AMZN", "changePercent": round(random.uniform(-5, 5), 2)},
+        {"symbol": "AAPL", "price": 185.12},
+        {"symbol": "GOOGL", "price": 138.42},
+        {"symbol": "MSFT", "price": 301.52},
+        {"symbol": "TSLA", "price": 213.40},
+        {"symbol": "AMZN", "price": 121.67},
+        {"symbol": "NVDA", "price": 957.38},
+        {"symbol": "META", "price": 491.12},
+        {"symbol": "NFLX", "price": 612.77},
+        {"symbol": "BABA", "price": 76.88},
+        {"symbol": "INTC", "price": 31.45},
     ]
-    return StockListResponse(stocks=[StockItem(**stock) for stock in sample_stocks])
+
+    stocks = [
+        StockItem(
+            symbol=stock["symbol"],
+            price=stock["price"],
+            changePercent=round(random.uniform(-5, 5), 2),
+            volume=random.randint(100_000, 5_000_000)
+        )
+        for stock in sample_stocks
+    ]
+
+    return StockListResponse(stocks=stocks)
 
 # 상세 종목 API
 @app.get("/detail/{stock_symbol}", response_model=StockItem)
 def stock_detail(stock_symbol: str):
     return StockItem(
         symbol=stock_symbol,
-        changePercent=round(random.uniform(-5, 5), 2)
+        price=round(random.uniform(50, 1000), 2),
+        changePercent=round(random.uniform(-5, 5), 2),
+        volume=random.randint(100_000, 5_000_000)        //마지막 수정: 테스트 주석
     )
