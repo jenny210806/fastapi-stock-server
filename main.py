@@ -62,5 +62,5 @@ def stock_detail(stock_symbol: str):
         symbol=stock_symbol,
         price=round(random.uniform(50, 1000), 2),
         changePercent=round(random.uniform(-5, 5), 2),
-        volume=random.randint(100_000, 5_000_000)        //마지막 수정: 테스트 주석
+        volume=random.randint(100_000, 5_000_000)        # 마지막 수정: 테스트 주석
     )
